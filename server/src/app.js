@@ -1,5 +1,4 @@
 import express from 'express';
-import authRouter from './routes/auth.routes.js';// requires all the routes here and use them in the app
 import cookieParser from 'cookie-parser'
 import cors from 'cors';
 
@@ -12,7 +11,14 @@ app.use(cors({
   credentials: true,
 }));
 
+
+import authRouter from './routes/auth.routes.js';
+import interviewRouter from './routes/interview.routes.js';
+
+
+// using all the routes here
 app.use('/api/auth', authRouter)
+app.use('/api/interview', interviewRouter)
 
 
 app.get('/', (req, res) => {

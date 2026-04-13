@@ -44,17 +44,18 @@ async function generateInterviewReport({ resume, selfDescription, jobDescription
 
     try {
         const response = await ai.models.generateContent({
-            model: "gemini-3-flash-preview",
+            model: "gemini-2.5-flash-lite", 
             contents: prompt,
             config: {
                 responseMimeType: "application/json",
                 responseSchema: zodToJsonSchema(interviewReportSchema),
-            }
+            },
         });
 
-        console.log(response.text);
+        return JSON.parse(response.text);
     } catch (error) {
-        console.error("Error generating report:", error);
+        console.error("AI Generation Error:", error);
+        throw error; // Throwing it allows your controller's try/catch to handle the error properly!
     }
 }
 
