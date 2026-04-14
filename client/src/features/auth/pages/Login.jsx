@@ -1,42 +1,63 @@
-import React, {useState} from 'react'
-
-import '../auth.form.scss'
-import { useNavigate, Link} from "react-router"
-import { useAuth } from '../hooks/useAuth.js'
-
+import React, { useState } from 'react';
+import '../auth.form.scss';
+import { useNavigate, Link } from "react-router"; 
+import { useAuth } from '../hooks/useAuth.js';
 
 const Login = () => {
   const { loading, handleLogin } = useAuth();
   const navigate = useNavigate();
-  const [email,setEmail] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const handleSubmit = async(e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    await handleLogin({email,password})
-    navigate("/")
-    //Handle login logic here
+    try {
+      await handleLogin({ email, password });
+      navigate("/");
+    } catch (error) {
+      console.error("Login failed", error);
+      alert("Login failed! Check your browser console."); 
+    }
   }
 
-  if(loading){
-    return (<main><div className='form-container'><h1>Loading...</h1></div></main>)
+  if (loading) {
+    return (
+      <main>
+        <div className='form-container'>
+          <h1>Loading...</h1>
+        </div>
+      </main>
+    );
   }
+
   return (
     <main>
       <div className="form-container">
         <h1>Login</h1>
-        <form  onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit}>
           <div className="input-group">
             <label htmlFor="email">Email</label>
-            <input onChange={(e) => setEmail(e.target.value)} type="email" id="email" name="email" placeholder='Enter email address' required />
-
+            <input 
+              onChange={(e) => setEmail(e.target.value)} 
+              type="email" 
+              id="email" 
+              name="email" 
+              placeholder='Enter email address' 
+              required 
+            />
           </div>
           <div className="input-group">
             <label htmlFor="password">Password</label>
-            <input onChange={(e) => setPassword(e.target.value)}  type="password" id="password" name="password" placeholder='Enter password' required/>
-            
+            <input 
+              onChange={(e) => setPassword(e.target.value)}  
+              type="password" 
+              id="password" 
+              name="password" 
+              placeholder='Enter password' 
+              required 
+            />
           </div>
-          <button className='button primary-button'>Login</button>
+          <button type="submit" className='button primary-button'>Login</button>
         </form>
 
         <p>
@@ -44,9 +65,7 @@ const Login = () => {
         </p>
       </div>
     </main>
-      
-    
-  )
+  );
 }
 
-export default Login
+export default Login;

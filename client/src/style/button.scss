@@ -1,19 +1,21 @@
-.button{
+.button.primary-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 24px;
+    background: linear-gradient(135deg, #ff2b5e 0%, #e6003e 100%);
+    color: white;
     border: none;
-    outline: none;
-    padding-inline: 1.5rem;
-    padding-block: 0.75rem;
-    border-radius: 1rem;
+    border-radius: 8px;
     cursor: pointer;
+    font-size: 15px;
+    font-weight: 600;
+    gap: 8px;
+    box-shadow: 0 4px 14px rgba(255, 43, 94, 0.3);
+    transition: transform 0.2s, box-shadow 0.2s;
+}
 
-    transition: all 0.3s ease-in-out;
-
-    &.primary-button {
-        background-color: #e1034d;
-        color: white;
-    }
-
-    &:active{
-        transform:scale(0.9);
-    }
+.button.primary-button:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 20px rgba(255, 43, 94, 0.4);
 }

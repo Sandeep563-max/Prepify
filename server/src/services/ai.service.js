@@ -1,6 +1,7 @@
 import { GoogleGenAI } from "@google/genai";
 import { z } from "zod";
 import { zodToJsonSchema } from "zod-to-json-schema";
+import puppeteer from "puppeteer";
 
 const interviewReportSchema = z.object({
     technicalQuestions: z.array(
@@ -30,6 +31,8 @@ const interviewReportSchema = z.object({
             tasks: z.array(z.string()).describe('List of specific tasks to complete on this day')
         })
     ).describe("The preparation plan for the interview"),
+    title: z.string().describe("A concise title for the interview report, ideally reflecting the target job role and key focus areas."),
+
 });
 
 async function generateInterviewReport({ resume, selfDescription, jobDescription }) {
@@ -58,5 +61,7 @@ async function generateInterviewReport({ resume, selfDescription, jobDescription
         throw error; // Throwing it allows your controller's try/catch to handle the error properly!
     }
 }
+
+
 
 export { generateInterviewReport };

@@ -3,6 +3,7 @@ import authMiddleware from '../middlewares/auth.middleware.js'; // This IS the a
 import interviewController from '../controllers/interview.controller.js';
 import upload from '../middlewares/file.middleware.js';
 
+
 const interviewRouter = express.Router();
 
 /**
@@ -11,7 +12,24 @@ const interviewRouter = express.Router();
  * @access Private (requires authentication)
  */
 
-// FIX: Passed authMiddleware directly instead of authMiddleware.authUser
+
 interviewRouter.post('/', authMiddleware, upload.single('resume'), interviewController.generateInterviewReportController);
+
+/**
+ * @route GET /api/interview/:interviewId
+ * @desc Get interview report by interviewID
+ * @access Private (requires authentication)
+ */
+
+interviewRouter.get('/report/:interviewId', authMiddleware, interviewController.getInterviewReportByIdController);
+
+
+/**
+ * @route GET /api/interview
+ * @desc Get all interview reports of the logged in user
+ * @access Private (requires authentication)
+ */
+
+interviewRouter.get('/', authMiddleware, interviewController.getAllInterviewReportsController);
 
 export default interviewRouter;
