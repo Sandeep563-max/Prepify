@@ -1,15 +1,6 @@
-import { createRequire } from "module";
-const require = createRequire(import.meta.url);
-const pdfParse = require("pdf-parse");
-import { generateInterviewReport } from "../services/ai.service.js";
+import pdfParse from "pdf-extraction"; 
+import { generateInterviewReport, generateResumePdf } from "../services/ai.service.js";
 import interviewReportModel from "../models/interviewReport.model.js";    
-
-/**
- * 
- * @desc Generate interview report based on user resume, selfdescription and job description
- * 
- * 
- */
 
 async function generateInterviewReportController(req, res) {
     try {
@@ -17,19 +8,21 @@ async function generateInterviewReportController(req, res) {
             return res.status(400).json({ message: "Resume file is required" });
         }
         
+        // Parse the PDF using the modern, ESM-friendly library
         const resumeContent = await pdfParse(req.file.buffer);
-        
         const { selfDescription, jobDescription } = req.body;
 
+        // Generate the report content via Gemini AI
         const interviewReportByAi = await generateInterviewReport({
             resume: resumeContent.text,
             selfDescription,
             jobDescription
         });
 
-
+        // 🚀 FIX: Save to MongoDB with the required title field!
         const interviewReport = await interviewReportModel.create({
             user: req.user.id, 
+            title: interviewReportByAi.title || "Custom Interview Plan", 
             resume: resumeContent.text,
             selfDescription,
             jobDescription, 
@@ -42,6 +35,7 @@ async function generateInterviewReportController(req, res) {
         });
 
     } catch (error) {
+        console.error("============= BACKEND CRASH =============");
         console.error(error);
         res.status(500).json({
             message: "An error occurred while generating the interview report.",
@@ -50,10 +44,6 @@ async function generateInterviewReportController(req, res) {
     }
 }
 
-/**
- * @desc Get interview report by interviewID
- * 
- */
 async function getInterviewReportByIdController(req, res) {
     try {
         const { interviewId } = req.params;
@@ -69,7 +59,7 @@ async function getInterviewReportByIdController(req, res) {
     } catch (error) {
         console.error(error);
         res.status(500).json({
-            message: "An error occurred while generating the interview report.",
+            message: "An error occurred while fetching the interview report.",
             error: error.message
         });
     } 
@@ -92,4 +82,30 @@ async function getAllInterviewReportsController(req, res) {
     }
 }
 
-export default { generateInterviewReportController, getInterviewReportByIdController, getAllInterviewReportsController };
+async function generateResumePdfController(req, res) {
+    try {
+        const { interviewReportId } = req.params;
+        const interviewReport = await interviewReportModel.findOne({ _id: interviewReportId, user: req.user.id });
+
+        if (!interviewReport) {
+            return res.status(404).json({ message: "Interview report not found" });
+        }
+
+        const { selfDescription, resume, jobDescription } = interviewReport;
+        const pdfBuffer = await generateResumePdf({ selfDescription, resume, jobDescription });
+
+        res.set({
+            'Content-Type': 'application/pdf',
+            'Content-Disposition': `attachment; filename=resume_${interviewReportId}.pdf`,
+        });
+        res.send(pdfBuffer);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({
+            message: "An error occurred while generating the PDF.",
+            error: error.message
+        });
+    }
+}
+
+export default { generateInterviewReportController, getInterviewReportByIdController, getAllInterviewReportsController, generateResumePdfController };

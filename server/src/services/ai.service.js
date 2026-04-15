@@ -1,46 +1,86 @@
 import { GoogleGenAI } from "@google/genai";
-import { z } from "zod";
-import { zodToJsonSchema } from "zod-to-json-schema";
 import puppeteer from "puppeteer";
 
-const interviewReportSchema = z.object({
-    technicalQuestions: z.array(
-        z.object({
-            question: z.string().describe("The technical question can be asked in the interview"),
-            intentions: z.string().describe("The intention of interviewer behind asking this question"),
-            answer: z.string().describe("How to answer this questions what points to cover, what approach")
-        })
-    ),
-    behavioralQuestions: z.array(
-        z.object({
-            question: z.string().describe("The behavioral question can be asked in the interview"),
-            intentions: z.string().describe("The intention of interviewer behind asking this question"),
-            answer: z.string().describe("How to answer this questions what points to cover, what approach")
-        })
-    ),
-    skillGaps: z.array(
-        z.object({
-            skill: z.string().describe("The skill which the candidate is lacking"),
-            severity: z.enum(["low", "medium", "high"]).describe('The severity of the skill gap.')
-        })
-    ).describe("The gaps in the candidates skills that needs to be addressed."),
-    preparationPlan: z.array(
-        z.object({
-            day: z.number().describe('The day number in the preparation plan'),
-            focus: z.string().describe('The main focus or topic for this day'),
-            tasks: z.array(z.string()).describe('List of specific tasks to complete on this day')
-        })
-    ).describe("The preparation plan for the interview"),
-    title: z.string().describe("A concise title for the interview report, ideally reflecting the target job role and key focus areas."),
+function getAIClient() {
+    const apiKey = process.env.GEMINI_API_KEY;
+    
+    if (!apiKey) {
+        throw new Error("GEMINI_API_KEY is not defined in the environment variables.");
+    }
+    
+    return new GoogleGenAI({ apiKey });
+}
 
-});
+const interviewReportSchema = {
+    type: "OBJECT",
+    properties: {
+        title: { 
+            type: "STRING", 
+            description: "A concise title for the interview report." 
+        },
+        matchScore: { 
+            type: "NUMBER", 
+            description: "An overall match score percentage between 0 and 100." 
+        },
+        technicalQuestions: {
+            type: "ARRAY",
+            items: {
+                type: "OBJECT",
+                properties: {
+                    question: { type: "STRING" },
+                    intention: { type: "STRING" },
+                    answer: { type: "STRING" }
+                },
+                required: ["question", "intention", "answer"]
+            }
+        },
+        behavioralQuestions: {
+            type: "ARRAY",
+            items: {
+                type: "OBJECT",
+                properties: {
+                    question: { type: "STRING" },
+                    intention: { type: "STRING" },
+                    answer: { type: "STRING" }
+                },
+                required: ["question", "intention", "answer"]
+            }
+        },
+        skillGaps: {
+            type: "ARRAY",
+            items: {
+                type: "OBJECT",
+                properties: {
+                    skill: { type: "STRING" },
+                    severity: { type: "STRING", description: "low, medium, or high" }
+                },
+                required: ["skill", "severity"]
+            }
+        },
+        preparationPlan: {
+            type: "ARRAY",
+            items: {
+                type: "OBJECT",
+                properties: {
+                    day: { type: "NUMBER" },
+                    focus: { type: "STRING" },
+                    tasks: { 
+                        type: "ARRAY", 
+                        items: { type: "STRING" } 
+                    }
+                },
+                required: ["day", "focus", "tasks"]
+            }
+        }
+    },
+    required: ["title", "matchScore", "technicalQuestions", "behavioralQuestions", "skillGaps", "preparationPlan"]
+};
 
 async function generateInterviewReport({ resume, selfDescription, jobDescription }) {
-    const ai = new GoogleGenAI({
-        apiKey: process.env.GEMINI_API_KEY,
-    });
+    const ai = getAIClient();
 
-    const prompt = `Generate an interview preparation report based on the following information:
+    const prompt = `You are an expert technical interviewer. Generate a strictly formatted JSON interview preparation report based on the following information. You MUST strictly follow the requested JSON schema.
+    
     Resume: ${resume}
     Self Description: ${selfDescription}
     Job Description: ${jobDescription}`;
@@ -51,17 +91,63 @@ async function generateInterviewReport({ resume, selfDescription, jobDescription
             contents: prompt,
             config: {
                 responseMimeType: "application/json",
-                responseSchema: zodToJsonSchema(interviewReportSchema),
+                responseSchema: interviewReportSchema,
             },
         });
 
-        return JSON.parse(response.text);
+        const data = JSON.parse(response.text);
+        return data;
     } catch (error) {
         console.error("AI Generation Error:", error);
-        throw error; // Throwing it allows your controller's try/catch to handle the error properly!
+        throw error; 
     }
 }
 
+async function generatePdfFromHtml(htmlContent) {
+    const browser = await puppeteer.launch();
+    const page = await browser.newPage();
+    await page.setContent(htmlContent, { waitUntil: 'networkidle0' });
+    const pdfBuffer = await page.pdf({ format: 'A4', margin: { top: '20mm', bottom: '20mm', left: '15mm', right: '15mm' } });
+    await browser.close();
+    return pdfBuffer;
+}
 
+async function generateResumePdf({resume, selfDescription, jobDescription}) {
+    const ai = getAIClient();
 
-export { generateInterviewReport };
+    const resumePdfSchema = {
+        type: "OBJECT",
+        properties: {
+            html: { type: "STRING", description: "The HTML content of the resume" }
+        },
+        required: ["html"]
+    };
+
+    const prompt = `Generate a resume for the candidate with the following details:
+    Resume: ${resume}
+    Self Description: ${selfDescription}
+    Job Description: ${jobDescription};
+
+    The response should be a JSON object with a single field "html" which contains the HTML content of the resume which can be converted to PDF using any library like puppeteer.
+    The resume should be tailored for the given job description and should highlight the candidate's strengths and relevant experience. The HTML content should be well-formatted and structured.`;
+
+    try {
+        const response = await ai.models.generateContent({
+            model: "gemini-2.5-flash-lite", 
+            contents: prompt,   
+            config: {
+                responseMimeType: "application/json",
+                responseSchema: resumePdfSchema,
+            },
+        });
+
+        const jsonContent = JSON.parse(response.text);
+        const pdfBuffer = await generatePdfFromHtml(jsonContent.html);
+        return pdfBuffer;
+    } catch (error) {
+        console.error("PDF Generation Error:", error);
+        throw error;
+    }
+}
+
+export { generateInterviewReport, generateResumePdf };

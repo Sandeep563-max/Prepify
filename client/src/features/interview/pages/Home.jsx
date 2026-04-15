@@ -1,21 +1,39 @@
 import React, { useState, useRef } from 'react'
 import "../style/home.scss"
 import { useInterview } from '../hooks/useinterview.js'
-import { useNavigate } from 'react-router'
+import { useNavigate } from 'react-router' 
 
 const Home = () => {
 
-    const { loading, generateReport,reports } = useInterview()
+    const { loading, generateReport, reports } = useInterview()
     const [ jobDescription, setJobDescription ] = useState("")
     const [ selfDescription, setSelfDescription ] = useState("")
+    
+    const [ selectedFileName, setSelectedFileName ] = useState(null)
     const resumeInputRef = useRef()
 
     const navigate = useNavigate()
 
+    
+    const handleFileChange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            setSelectedFileName(file.name);
+        }
+    }
+
     const handleGenerateReport = async () => {
-        const resumeFile = resumeInputRef.current.files[ 0 ]
-        const data = await generateReport({ jobDescription, selfDescription, resumeFile })
-        navigate(`/interview/${data._id}`)
+        try {
+            const resumeFile = resumeInputRef.current?.files[0]
+            const data = await generateReport({ jobDescription, selfDescription, resumeFile })
+            
+            if (data && data._id) {
+                navigate(`/interview/${data._id}`)
+            }
+        } catch (error) {
+            console.error("Failed to generate report:", error);
+            alert("Something went wrong generating the report. Please try again.");
+        }
     }
 
     if (loading) {
@@ -75,13 +93,36 @@ const Home = () => {
                                 Upload Resume
                                 <span className='badge badge--best'>Best Results</span>
                             </label>
-                            <label className='dropzone' htmlFor='resume'>
-                                <span className='dropzone__icon'>
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="16 16 12 12 8 16" /><line x1="12" y1="12" x2="12" y2="21" /><path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3" /></svg>
-                                </span>
-                                <p className='dropzone__title'>Click to upload or drag &amp; drop</p>
-                                <p className='dropzone__subtitle'>PDF or DOCX (Max 5MB)</p>
-                                <input ref={resumeInputRef} hidden type='file' id='resume' name='resume' accept='.pdf,.docx' />
+                            
+                            {/* 🚀 ADVANCEMENT: Dynamic UI rendering based on selected file */}
+                            <label className={`dropzone ${selectedFileName ? 'dropzone--success' : ''}`} htmlFor='resume'>
+                                {selectedFileName ? (
+                                    <>
+                                        <span className='dropzone__icon' style={{ color: '#4CAF50' }}>
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                                        </span>
+                                        <p className='dropzone__title' style={{ color: '#4CAF50', fontWeight: 'bold' }}>{selectedFileName}</p>
+                                        <p className='dropzone__subtitle'>Resume attached successfully. Click to change.</p>
+                                    </>
+                                ) : (
+                                    <>
+                                        <span className='dropzone__icon'>
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="16 16 12 12 8 16" /><line x1="12" y1="12" x2="12" y2="21" /><path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3" /></svg>
+                                        </span>
+                                        <p className='dropzone__title'>Click to upload or drag &amp; drop</p>
+                                        <p className='dropzone__subtitle'>PDF or DOCX (Max 5MB)</p>
+                                    </>
+                                )}
+                                
+                                <input 
+                                    ref={resumeInputRef} 
+                                    onChange={handleFileChange} // Triggers the UI update
+                                    hidden 
+                                    type='file' 
+                                    id='resume' 
+                                    name='resume' 
+                                    accept='.pdf,.docx' 
+                                />
                             </label>
                         </div>
 
@@ -115,15 +156,17 @@ const Home = () => {
                     <span className='footer-info'>AI-Powered Strategy Generation &bull; Approx 30s</span>
                     <button
                         onClick={handleGenerateReport}
-                        className='generate-btn'>
+                        className='generate-btn'
+                        disabled={loading} 
+                    >
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z" /></svg>
-                        Generate My Interview Strategy
+                        {loading ? "Generating..." : "Generate My Interview Strategy"}
                     </button>
                 </div>
             </div>
 
             {/* Recent Reports List */}
-            {reports.length > 0 && (
+            {reports && reports.length > 0 && (
                 <section className='recent-reports'>
                     <h2>My Recent Interview Plans</h2>
                     <ul className='reports-list'>
