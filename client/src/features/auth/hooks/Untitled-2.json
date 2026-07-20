@@ -1,0 +1,106 @@
+{
+  "_id": {
+    "$oid": "699af91fe5a3daf502d43744"
+  },
+  "matchScore": 88,
+  "technicalQuestions": [
+    {
+      "question": "Explain the Node.js event loop and how it handles asynchronous operations.",
+      "intentions": "To assess the candidate's deep understanding of Node.js core architecture and non-blocking I/O.",
+      "answer": "Explain the different phases of the event loop (timers, pending callbacks, poll, check, close callbacks) and how libuv is used to offload heavy operations to the system kernel or thread pool."
+    },
+    {
+      "question": "How do you optimize a MongoDB aggregation pipeline for a collection with millions of documents?",
+      "intentions": "To test practical experience with database performance tuning and query optimization.",
+      "answer": "Focus on using $match and $sort as early as possible in the pipeline to utilize indexes, restricting the number of documents passed to subsequent stages, and only projecting required fields."
+    },
+    {
+      "question": "Can you describe the Cache-Aside pattern and when you would use it in a Node application?",
+      "intentions": "To evaluate the candidate's understanding of caching strategies and system design.",
+      "answer": "Explain that the application first checks the cache (e.g., Redis). On a cache miss, it fetches data from the database, populates the cache, and returns it. Mention it is ideal for read-heavy workloads."
+    }
+  ],
+  "behavioralQuestions": [
+    {
+      "question": "Tell me about a time you had to optimize a piece of code or a database query under a tight deadline.",
+      "intentions": "To understand how the candidate handles pressure and balances code quality with delivery speed.",
+      "answer": "Use the STAR method. Describe the specific bottleneck, the tools used to identify it (e.g., profiling, explain plans), the action taken to fix it, and the measurable outcome."
+    },
+    {
+      "question": "Describe a situation where you disagreed with a senior developer on an architectural decision.",
+      "intentions": "To gauge communication skills, teamwork, and the ability to handle technical conflicts professionally.",
+      "answer": "Focus on objective communication. Explain how you presented data or benchmarks to support your approach, listened to their perspective, and how you eventually reached a consensus."
+    }
+  ],
+  "skillGaps": [
+    {
+      "skill": "Microservices Architecture",
+      "severity": "high"
+    },
+    {
+      "skill": "Advanced Caching Strategies (Redis/Memcached)",
+      "severity": "medium"
+    },
+    {
+      "skill": "System Design for High Scale",
+      "severity": "medium"
+    }
+  ],
+  "preparationPlan": [
+    {
+      "day": 1,
+      "focus": "Core Node.js & Asynchronous Programming",
+      "tasks": [
+        "Review the Node.js Event Loop phases in depth.",
+        "Practice solving promise-based and async/await tricky output questions.",
+        "Study memory management and garbage collection in V8."
+      ]
+    },
+    {
+      "day": 2,
+      "focus": "MongoDB Optimization",
+      "tasks": [
+        "Review indexing strategies (compound, text, multikey).",
+        "Practice writing complex aggregation pipelines on mock data.",
+        "Learn how to read and interpret an explain() plan in MongoDB."
+      ]
+    },
+    {
+      "day": 3,
+      "focus": "Addressing Skill Gaps: Caching & System Design",
+      "tasks": [
+        "Set up a local Redis instance and integrate it with a basic Express app.",
+        "Study standard caching patterns (Cache-Aside, Write-Through).",
+        "Watch 2 system design mock interviews focusing on distributed systems."
+      ]
+    },
+    {
+      "day": 4,
+      "focus": "Addressing Skill Gaps: Microservices",
+      "tasks": [
+        "Read up on microservices communication patterns (REST vs gRPC vs Message Brokers).",
+        "Understand the API Gateway pattern and Circuit Breaker pattern.",
+        "Review basic Docker containerization concepts for deploying services."
+      ]
+    },
+    {
+      "day": 5,
+      "focus": "Mock Interviews & Behavioral Prep",
+      "tasks": [
+        "Draft STAR method answers for 3 common behavioral questions.",
+        "Conduct a technical mock interview with a peer or use an AI tool.",
+        "Review your resume deeply to ensure you can explain every bullet point."
+      ]
+    }
+  ],
+  "user": {
+    "$oid": "6996f4980e02fcd18cd8f0df"
+  },
+  "createdAt": {
+    "$date": "2026-02-22T12:39:59.110Z"
+  },
+  "updatedAt": {
+    "$date": "2026-02-22T12:39:59.110Z"
+  },
+  "__v": 0
+}

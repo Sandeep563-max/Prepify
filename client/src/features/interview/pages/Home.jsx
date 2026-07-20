@@ -8,13 +8,11 @@ const Home = () => {
     const { loading, generateReport, reports } = useInterview()
     const [ jobDescription, setJobDescription ] = useState("")
     const [ selfDescription, setSelfDescription ] = useState("")
-    
     const [ selectedFileName, setSelectedFileName ] = useState(null)
     const resumeInputRef = useRef()
 
     const navigate = useNavigate()
 
-    
     const handleFileChange = (e) => {
         const file = e.target.files[0];
         if (file) {
@@ -46,7 +44,7 @@ const Home = () => {
 
     return (
         <div className='home-page'>
-
+            
             {/* Page Header */}
             <header className='page-header'>
                 <h1>Create Your Custom <span className='highlight'>Interview Plan</span></h1>
@@ -94,7 +92,6 @@ const Home = () => {
                                 <span className='badge badge--best'>Best Results</span>
                             </label>
                             
-                            {/* 🚀 ADVANCEMENT: Dynamic UI rendering based on selected file */}
                             <label className={`dropzone ${selectedFileName ? 'dropzone--success' : ''}`} htmlFor='resume'>
                                 {selectedFileName ? (
                                     <>
@@ -116,7 +113,7 @@ const Home = () => {
                                 
                                 <input 
                                     ref={resumeInputRef} 
-                                    onChange={handleFileChange} // Triggers the UI update
+                                    onChange={handleFileChange} 
                                     hidden 
                                     type='file' 
                                     id='resume' 

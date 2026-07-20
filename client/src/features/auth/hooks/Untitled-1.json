@@ -1,0 +1,36 @@
+{
+  "_id": {
+    "$oid": "699af91fe5a3daf502d43744"
+  },
+  "jobDescription": "Position: Backend Developer (Node.js). Requirements: 3+ years experience with Node.js, Express, MongoDB. Strong understanding of asynchronous programming, RESTful APIs, caching strategies, and microservices architecture.",
+  "resume": "Ankur Sharma\nLocation: Bhopal, India\nExperience: 2+ years building scalable web applications. Proficient in Node.js, Express, and React. Strong background in designing MongoDB schemas and writing complex aggregation pipelines.",
+  "selfDescription": "I am a MERN stack developer with a strong passion for backend architecture, API optimization, and solving complex data problems.",
+  "matchScore": 88,
+  "technicalQuestions": [
+    {
+      "question": "Explain the Node.js event loop and how it handles asynchronous operations.",
+      "intention": "To assess the candidate's deep understanding of Node.js core architecture and non-blocking I/O.",
+      "answer": "The candidate should explain the different phases of the event loop (timers, pending callbacks, poll, check, close callbacks) and how libuv is used to offload heavy operations to the system kernel or thread pool."
+    },
+    {
+      "question": "How do you optimize a MongoDB aggregation pipeline for a collection with millions of documents?",
+      "intention": "To test practical experience with database performance tuning and query optimization.",
+      "answer": "The candidate should focus on using $match and $sort as early as possible in the pipeline to utilize indexes, restricting the number of documents passed to subsequent stages, and only projecting required fields."
+    },
+    {
+      "question": "Can you describe the Cache-Aside pattern and when you would use it in a Node application?",
+      "intention": "To evaluate the candidate's understanding of caching strategies and system design.",
+      "answer": "The candidate should explain that the application first checks the cache (e.g., Redis). On a cache miss, it fetches data from the database, populates the cache, and returns it. It is ideal for read-heavy workloads where data doesn't change every second."
+    },
+    {
+      "question": "How do you handle unhandled promise rejections and uncaught exceptions in an Express server?",
+      "intention": "To verify the candidate knows how to build resilient backend applications that don't crash silently.",
+      "answer": "The candidate should mention attaching listeners to 'process.on(\"uncaughtException\")' and 'process.on(\"unhandledRejection\")', logging the errors gracefully using a logger like Winston, and properly shutting down and restarting the process using a tool like PM2."
+    },
+    {
+      "question": "What steps do you take to secure a RESTful API built with Node.js?",
+      "intention": "To assess the candidate's awareness of common web vulnerabilities and security best practices.",
+      "answer": "The candidate should mention implementing authentication/authorization (JWT/OAuth), using Helmet.js for secure HTTP headers, implementing rate limiting to prevent brute force attacks, and sanitizing inputs to prevent NoSQL injection."
+    }
+  ]
+}

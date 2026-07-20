@@ -5,6 +5,25 @@ const api = axios.create({
     withCredentials: true
 });
 
+
+// This runs automatically before every single request (register, login, getMe, etc.)
+api.interceptors.request.use(
+    (config) => {
+        // Grab the token from Local Storage
+        const token = localStorage.getItem('token');
+        
+        // If a token exists, attach it to the Authorization header
+        if (token) {
+            config.headers.Authorization = `Bearer ${token}`;
+        }
+        
+        return config;
+    },
+    (error) => {
+        return Promise.reject(error);
+    }
+);
+
 export async function register({ username, email, password }) {
     try {
         const response = await api.post('/api/auth/register', {
