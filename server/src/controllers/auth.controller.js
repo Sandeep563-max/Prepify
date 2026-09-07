@@ -3,6 +3,13 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import tokenBlackListModel from "../models/blacklist.model.js";
 
+const COOKIE_OPTIONS = {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax",
+    path: "/"
+};
+
 async function registerUserController(req, res) {
     const { username, email, password } = req.body;
 
@@ -26,7 +33,7 @@ async function registerUserController(req, res) {
 
     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: "1d" });
 
-    res.cookie("token", token);
+    res.cookie("token", token, COOKIE_OPTIONS);
 
     res.status(201).json({
         message: "User registered successfully",
@@ -53,7 +60,7 @@ async function loginUserController(req, res) {
     }
 
     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: "1d" });
-    res.cookie("token", token);
+    res.cookie("token", token, COOKIE_OPTIONS);
 
     res.status(200).json({
         message: "Login successful",
@@ -72,7 +79,7 @@ async function logoutUserController(req, res) {
         await tokenBlackListModel.create({ token });
     }
 
-    res.clearCookie("token");
+    res.clearCookie("token", COOKIE_OPTIONS);
 
     res.status(200).json({ message: "Logout successful" });
 } // <-- Closed the logout controller here!

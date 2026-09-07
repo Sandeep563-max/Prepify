@@ -31,17 +31,18 @@ export const useAuth = ()=> {
         }
             };
 
-    const handleLogout  = async () => {
-        setLoading(true)
+    const handleLogout = async () => {
+        setLoading(true);
         try {
-         const data = await logout();
-        setUser(data.user)
+            await logout();
+            setUser(null);
+            localStorage.removeItem('token');
         } catch (error) {
-            console.error("Error loging out", error);
+            console.error("Error logging out", error);
         } finally {
-            setLoading(false)
+            setLoading(false);
         }
-            };
+    };
 
             useEffect(()=>{
                     const getAndSetUser = async() => {

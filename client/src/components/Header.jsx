@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router';
+import { useAuth } from '../features/auth/hooks/useAuth.js';
 import './header.scss';
 
 export default function Header() {
@@ -7,6 +8,7 @@ export default function Header() {
   const dropdownRef = useRef(null);
   const avatarRef = useRef(null);
   const navigate = useNavigate();
+  const { handleLogout } = useAuth();
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -29,8 +31,8 @@ export default function Header() {
     };
   }, [isDropdownOpen]);
 
-  const handleSignOut = () => {
-    localStorage.removeItem('token');
+  const handleSignOut = async () => {
+    await handleLogout();
     setIsDropdownOpen(false);
     navigate('/login');
   };

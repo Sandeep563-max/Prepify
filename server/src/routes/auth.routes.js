@@ -26,7 +26,7 @@ authRouter.post('/login', loginUserController);
  * @access Public
  */
 
-authRouter.get("/logout",logoutUserController)
+authRouter.post("/logout",logoutUserController)
 
 /**
  * @route POST /api/auth/get-me
