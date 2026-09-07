@@ -8,7 +8,9 @@ export default function Header() {
   const dropdownRef = useRef(null);
   const avatarRef = useRef(null);
   const navigate = useNavigate();
-  const { handleLogout } = useAuth();
+  const { user, handleLogout } = useAuth();
+
+  const usernameInitial = user?.username ? user.username.charAt(0).toUpperCase() : '';
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -53,15 +55,15 @@ export default function Header() {
             onClick={() => setIsDropdownOpen(!isDropdownOpen)}
             aria-label="Toggle profile menu"
           >
-            S
+            {usernameInitial}
           </button>
 
           {/* Dropdown Card */}
           {isDropdownOpen && (
             <div ref={dropdownRef} className="profile-dropdown">
               <div className="dropdown-user-info">
-                <div className="user-name">Sandeep Kumar</div>
-                <div className="user-email">sandeep16285uk@gmail.com</div>
+                <div className="user-name">{user?.username || ''}</div>
+                <div className="user-email">{user?.email || ''}</div>
               </div>
 
               <div className="dropdown-divider"></div>
